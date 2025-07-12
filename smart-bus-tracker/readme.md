@@ -24,12 +24,3 @@ A responsive web app that lets users plan a bus journey by entering pickup and d
 
 - **HTML5** • **CSS3** • **JavaScript (ES6)**  
 - **Google Maps Embed API** for route rendering
-
----
-
-## 🚀 Getting Started
-
-1. Clone this repo (or copy these files into your project folder):  
-   ```bash
-   git clone https://github.com/<your-username>/front-end-tasks.git
-   cd front-end-tasks/smart-bus-tracker
