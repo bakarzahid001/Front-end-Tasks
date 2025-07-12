@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Smart Bus Tracker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f0f4f7;
+    }
+    header {
+      background-color: #007bff;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+    section {
+      display: none;
+      padding: 20px;
+    }
+    section.active {
+      display: block;
+    }
+
+    /* Login and signup pages with white background */
+    #loginPage.active,
+    #signupPage.active {
+      background: white;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    /* Center form container vertically and horizontally */
+    #loginPage .form-container,
+    #signupPage .form-container {
+      max-width: 400px;
+      margin: 60px auto;
+      background: white;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      border-radius: 10px;
+      padding: 20px;
+    }
+
+    /* Form container styling for other pages */
+    #routeInputPage .form-container,
+    #routeResultPage .form-container {
+      max-width: 400px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    /* Inputs styling */
+    input[type="text"],
+    input[type="password"],
+    input[type="email"] {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+    }
+    input[type="text"]:focus,
+    input[type="password"]:focus,
+    input[type="email"]:focus {
+      border-color: #007bff;
+      outline: none;
+      box-shadow: 0 0 5px rgba(0,123,255,0.5);
+    }
+
+    /* Button styling */
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      margin-top: 10px;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    /* Paragraph and links styling */
+    p {
+      margin-top: 15px;
+      font-size: 0.9rem;
+      text-align: center;
+    }
+    p a {
+      color: #007bff;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    p a:hover {
+      text-decoration: underline;
+    }
+
+    /* Splash screen */
+    .splash {
+      text-align: center;
+      padding: 50px;
+    }
+    .splash img {
+      width: 100px;
+      animation: bounce 2s infinite;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+
+    /* Route section */
+    .route-section {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .map-container iframe {
+      width: 100%;
+      height: 300px;
+      border: none;
+    }
+
+    .details-container {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .summary-title {
+      text-align: center;
+      font-size: 1.4rem;
+      margin-bottom: 10px;
+      color: #007bff;
+    }
+
+    /* New Route Summary Layout */
+    .route-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .summary-card {
+      background-color: #ffffff;
+      border: 1px solid #e1e1e1;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .summary-card h4 {
+      margin-bottom: 10px;
+      font-size: 1.1rem;
+      color: #555;
+    }
+
+    .summary-icon {
+      font-size: 2rem;
+      margin-bottom: 10px;
+      color: #007bff;
+    }
+
+    .summary-value {
+      font-size: 1.6rem;
+      font-weight: bold;
+      color: #007bff;
+    }
+
+    .summary-tip2 {
+      background: #e6f3ff;
+      border-left: 5px solid #007bff;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 1rem;
+      margin-top: 20px;
+      color: #333;
+    }
+
+    .bus-image {
+      text-align: center;
+      margin-top: 10px;
+    }
+    .bus-image img {
+      width: 100px;
+    }
+  </style>
+</head>
+<body>
+
+  <header><h1>Smart Bus Tracking & Route Optimization</h1></header>
+
+  <section id="loginPage" class="active">
+    <div class="form-container">
+      <h2>Login</h2>
+      <input type="text" placeholder="Username" id="loginUser" />
+      <input type="password" placeholder="Password" id="loginPass" />
+      <button onclick="login()">Login</button>
+      <p>Don't have an account? <a href="#" onclick="showSignup()">Sign up</a></p>
+    </div>
+  </section>
+
+  <section id="signupPage">
+    <div class="form-container">
+      <h2>Sign Up</h2>
+      <input type="text" placeholder="First Name" id="signupFirstName" />
+      <input type="text" placeholder="Last Name" id="signupLastName" />
+      <input type="email" placeholder="Email" id="signupEmail" />
+      <input type="password" placeholder="Password" id="signupPass" />
+      <button onclick="signup()">Sign Up</button>
+      <p>Already have an account? <a href="#" onclick="showLogin()">Login</a></p>
+    </div>
+  </section>
+
+  <section id="splashScreen" class="splash">
+    <img src="https://img.icons8.com/fluency/96/bus.png" alt="Bus Icon" />
+    <h2>Loading your smart journey...</h2>
+  </section>
+
+  <section id="routeInputPage">
+    <div class="form-container">
+      <h2>Plan Your Journey</h2>
+      <input type="text" placeholder="Enter pickup city " id="pickup" />
+      <input type="text" placeholder="Enter destination city " id="destination" />
+      <button onclick="showRoute()">Show Route</button>
+    </div>
+  </section>
+
+  <section id="routeResultPage">
+    <div class="form-container">
+      <h2>Route Details</h2>
+      <div class="route-section">
+        <div class="map-container">
+          <iframe id="mapFrame" src="" allowfullscreen></iframe>
+        </div>
+
+        <div class="details-container">
+          <h3 class="summary-title">🚌 Route Summary</h3>
+
+          <!--🎉 New Styled Summary Cards -->
+          <div class="route-summary-grid">
+            <div class="summary-card">
+              <div class="summary-icon">🕒</div>
+              <h4>Estimated Arrival Time</h4>
+              <div class="summary-value"><span id="eta">--</span> mins</div>
+            </div>
+            <div class="summary-card">
+              <div class="summary-icon">🪑</div>
+              <h4>Available Seats</h4>
+              <div class="summary-value"><span id="seats">--</span></div>
+            </div>
+            <div class="summary-card">
+              <div class="summary-icon">📍</div>
+              <h4>Next Bus Arrival</h4>
+              <div class="summary-value"><span id="nextBus">--</span> mins</div>
+            </div>
+          </div>
+
+          <div class="summary-tip2">
+            💡 <strong>Tip:</strong> Try to reach on time and travel safely.
+          </div>
+
+          <div class="bus-image">
+            <img src="https://img.icons8.com/color/96/bus.png" alt="Bus Picture" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const AVES_API_KEY = "YOUR_AVES_API_KEY_HERE"; // <-- Replace with your AvesAPI key
+
+    function hideAll() {
+      document.querySelectorAll('section').forEach(section => section.classList.remove('active'));
+    }
+
+    function showSignup() {
+      hideAll();
+      document.getElementById('signupPage').classList.add('active');
+    }
+
+    function showLogin() {
+      hideAll();
+      document.getElementById('loginPage').classList.add('active');
+    }
+
+    function login() {
+      const user = document.getElementById('loginUser').value;
+      const pass = document.getElementById('loginPass').value;
+      if (user && pass) {
+        hideAll();
+        document.getElementById('splashScreen').classList.add('active');
+        setTimeout(() => {
+          hideAll();
+          document.getElementById('routeInputPage').classList.add('active');
+        }, 2000);
+      } else {
+        alert('Please enter login credentials.');
+      }
+    }
+
+    function signup() {
+      const firstName = document.getElementById('signupFirstName').value.trim();
+      const lastName = document.getElementById('signupLastName').value.trim();
+      const email = document.getElementById('signupEmail').value.trim();
+      const pass = document.getElementById('signupPass').value;
+
+      if (firstName && lastName && email && pass) {
+        alert('Signup successful. Please log in.');
+        showLogin();
+      } else {
+        alert('Please fill out all fields.');
+      }
+    }
+
+    function showRoute() {
+      const pickup = document.getElementById('pickup').value.trim();
+      const dest = document.getElementById('destination').value.trim();
+
+      if (pickup && dest) {
+        hideAll();
+        document.getElementById('routeResultPage').classList.add('active');
+
+        const pickupEncoded = encodeURIComponent(pickup);
+        const destEncoded = encodeURIComponent(dest);
+        const mapUrl = `https://www.google.com/maps/embed/v1/directions?key=AIzaSyAOVYRIgupAurZup5y1PRh8Ismb1A3lLao&origin=${pickupEncoded}&destination=${destEncoded}&mode=driving&region=pk`;
+
+        document.getElementById('mapFrame').src = mapUrl;
+        document.getElementById('eta').textContent = Math.floor(Math.random() * 16) + 5;
+        document.getElementById('seats').textContent = Math.floor(Math.random() * 30) + 10;
+        document.getElementById('nextBus').textContent = Math.floor(Math.random() * 16) + 10;
+      } else {
+        alert("Please enter both pickup and destination cities.");
+      }
+    }
+  </script>
+</body>
+</html>
